@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const member_controller_1 = require("./member.controller");
+const error_handler_1 = require("../../shared/middleware/error-handler");
+const memberRouter = (0, express_1.Router)();
+memberRouter.post("/", (0, error_handler_1.errorHandler)(member_controller_1.memberController.createMember));
+memberRouter.get("/", (0, error_handler_1.errorHandler)(member_controller_1.memberController.getMembers));
+memberRouter.get("/:id", (0, error_handler_1.errorHandler)(member_controller_1.memberController.getMemberById));
+memberRouter.patch("/:id", (0, error_handler_1.errorHandler)(member_controller_1.memberController.updateMember));
+memberRouter.delete("/:id", (0, error_handler_1.errorHandler)(member_controller_1.memberController.deleteMember));
+exports.default = memberRouter;

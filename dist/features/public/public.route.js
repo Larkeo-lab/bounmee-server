@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const public_controller_1 = require("./public.controller");
+const error_handler_1 = require("@src/shared/middleware/error-handler");
+const publicRouter = (0, express_1.Router)();
+publicRouter.get("/table/:qrCode", (0, error_handler_1.errorHandler)(public_controller_1.PublicController.getTableByQr));
+publicRouter.get("/products/:storeId", (0, error_handler_1.errorHandler)(public_controller_1.PublicController.getPublicProducts));
+publicRouter.post("/order", (0, error_handler_1.errorHandler)(public_controller_1.PublicController.submitCustomerOrder));
+exports.default = publicRouter;

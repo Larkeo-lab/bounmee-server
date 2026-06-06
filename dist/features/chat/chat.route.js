@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const chat_controller_1 = require("./chat.controller");
+const error_handler_1 = require("../../shared/middleware/error-handler");
+const router = (0, express_1.Router)();
+router.get("/history/:tableId", (0, error_handler_1.errorHandler)(chat_controller_1.ChatController.getHistory));
+router.get("/unread/:storeId", (0, error_handler_1.errorHandler)(chat_controller_1.ChatController.getUnreadStoreCount));
+router.post("/read/:tableId", (0, error_handler_1.errorHandler)(chat_controller_1.ChatController.markTableAsRead));
+exports.default = router;

@@ -1,0 +1,13 @@
+model Province {
+    id        String   @id @default(uuid()) @db.Uuid
+    code      String   @unique @db.VarChar(100)
+    nameLo    String   @db.VarChar(100)
+    nameEn    String   @db.VarChar(100)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    createdBy String?  @db.VarChar(100)
+    updatedBy String?  @db.VarChar(100)
+    users     User[]
+
+    @@map("provinces")
+}

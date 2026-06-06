@@ -1,0 +1,24 @@
+{
+  "chatgpt.openOnStartup": true,
+  "files.autoSave": "afterDelay",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "files.exclude": {
+    "**/node_modules": true
+  },
+  "search.exclude": {
+    "**/node_modules": true
+  },
+
+  // Disable TypeScript formatter to avoid conflicts
+  "typescript.format.enable": false,
+  "javascript.format.enable": false,
+
+  // Biome format on save configuration
+  "editor.defaultFormatter": "biomejs.biome",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "always",
+    "source.organizeImports.biome": "always"
+  }
+}

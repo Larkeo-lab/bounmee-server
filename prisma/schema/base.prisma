@@ -1,0 +1,11 @@
+// prisma/schema/base.prisma
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["prismaSchemaFolder"] // ຕ້ອງເພີ່ມແຖວນີ້ (ສຳລັບ Prisma v5.15 ຂຶ້ນໄປ)
+}
+
+datasource db {
+  provider = "postgresql"
+  // ໝາຍເຫດ: ໃນ Prisma 7, url ຈະໄປຢູ່ໃນ prisma.config.ts ຄືທີ່ເຮົາເຮັດກ່ອນໜ້ານີ້
+}

@@ -1,0 +1,46 @@
+name: eezy-pos-server ci/cd
+
+on:
+  push:
+    branches:
+      - development
+      - production
+
+jobs:
+  deploy-development:
+    name: Deploy to Development
+    if: github.ref == 'refs/heads/development'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Dev EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST_DEV }}
+          username: ${{ secrets.EC2_USERNAME_DEV }}
+          key: ${{ secrets.EC2_SSH_KEY_DEV }}
+          script: |
+            cd /home/ubuntu/pos-server-dev
+            git pull origin development
+            docker compose up -d --build
+
+  deploy-production:
+    name: Deploy to Production
+    if: github.ref == 'refs/heads/production'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Prod EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST_PROD }}
+          username: ${{ secrets.EC2_USERNAME_PROD }}
+          key: ${{ secrets.EC2_SSH_KEY_PROD }}
+          script: |
+            cd /home/ubuntu/pos-server-prod
+            git pull origin production
+            docker compose up -d --build
