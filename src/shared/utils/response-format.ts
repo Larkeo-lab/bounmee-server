@@ -32,7 +32,7 @@ const ResponsePaginationSuccess = (
   const totalPages = Math.ceil(total / limit);
 
   res.status(statusCode).json({
-    code: `POS-${statusCode}`,
+    code: `${statusCode}`,
     message: "SUCCESS",
     data,
     pagination: {
@@ -51,7 +51,7 @@ const ResponseManyDataSuccess = (
   statusCode = 200,
 ) => {
   res.status(statusCode).json({
-    code: `POS-${statusCode}`,
+    code: `${statusCode}`,
     message: "SUCCESS",
     data,
   });

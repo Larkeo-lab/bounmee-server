@@ -1,0 +1,12 @@
+model VillageChief {
+    id              String   @id @default(uuid()) @db.Uuid
+    chiefName       String   @db.VarChar(100)
+    deputyChiefName String   @db.VarChar(100)
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    createdBy       String?  @db.VarChar(100)
+    updatedBy       String?  @db.VarChar(100)
+    users           User[]
+
+    @@map("village_chief")
+}

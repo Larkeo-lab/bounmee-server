@@ -6,17 +6,13 @@ import { authMiddleware } from "@src/shared/middleware/auth-middleware";
 const authRouter = Router();
 
 // Register citizen
-authRouter.post("/register", errorHandler(authController.register));
+authRouter.post("/register-citizen", errorHandler(authController.registerCitizen));
 // Login citizen
 authRouter.post("/login", errorHandler(authController.login));
 // Refresh token
 authRouter.post("/refresh-token", errorHandler(authController.refreshToken));
 // Update profile
-authRouter.put(
-  "/profile",
-  authMiddleware,
-  errorHandler(authController.updateProfile),
-);
+
 
 // Change password
 authRouter.put(

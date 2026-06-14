@@ -1,10 +1,9 @@
 import { prisma } from "@config/prisma";
-import { randomUUID } from "crypto";
+import { Gender } from "@prisma/client";
 import { hashSync, compareSync } from "bcryptjs";
 import jwt from "@src/shared/utils/jwt";
 import { NotFoundException } from "@exceptions/not-found";
 import { ErrorCode, ErrorMessages } from "@exceptions/root";
-import { UnauthorizedException } from "@exceptions/unauthorized";
 import { BadRequestException } from "@src/shared/exceptions/bad-request";
 import type {
   RegisterSchema,
@@ -44,8 +43,19 @@ export const registerService = async (data: RegisterSchema) => {
     );
   }
 
-  // Generate cartId as required by user.prisma
-  const cartId = randomUUID();
+  // Create Citizen record first
+  const citizen = await prisma.citizen.create({
+    data: {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      dateOfBirth: data.dateOfBirth,
+      gender: data.gender as Gender,
+      cartNumber: data.cartNumber,
+      profileImage: data.profileImage ?? "",
+      cartImage: data.cartImage,
+      cartImageBack: data.cartImageBack,
+    },
+  });
 
   const user = await prisma.user.create({
     data: {
@@ -53,27 +63,29 @@ export const registerService = async (data: RegisterSchema) => {
       password: hashedPassword,
       email: data.email || null,
       phone: data.phone || null,
-      profileImage: data.profileImage || null,
       provinceId: data.provinceId || null,
       districtId: data.districtId || null,
+      villageId: data.villageId || null,
       address: data.address || null,
-      cartId: cartId,
-      role: "CITIZEN", // Default role for registered users
+      citizenId: citizen.id,
+      userType: "CITIZEN", // Default userType for registered citizens
     },
     include: {
       province: true,
       district: true,
+      village: true,
+      citizen: true,
     },
   });
 
   const accessToken = jwt.sign({
     userId: user.id,
-    role: user.role,
+    role: user.userType,
   });
 
   const refreshToken = jwt.signRefreshToken({
     userId: user.id,
-    role: user.role,
+    role: user.userType,
   });
 
   const { password, ...userWithoutPassword } = user;
@@ -97,6 +109,8 @@ export const loginService = async (data: LoginSchema) => {
     include: {
       province: true,
       district: true,
+      citizen: true,
+      policeDepartment: true,
     },
   });
 
@@ -124,12 +138,12 @@ export const loginService = async (data: LoginSchema) => {
 
   const accessToken = jwt.sign({
     userId: user.id,
-    role: user.role,
+    role: user.userType,
   });
 
   const refreshToken = jwt.signRefreshToken({
     userId: user.id,
-    role: user.role,
+    role: user.userType,
   });
 
   const { password, ...userWithoutPassword } = user;
@@ -154,40 +168,6 @@ export const refreshTokenService = async (data: RefreshTokenSchema) => {
   return { accessToken, refreshToken: newRefreshToken };
 };
 
-export const updateProfileService = async (
-  userId: string,
-  data: UpdateProfileSchema,
-) => {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-  });
-
-  if (!user) {
-    throw new NotFoundException(
-      ErrorMessages.USER_NOT_FOUND,
-      ErrorCode.USER_NOT_FOUND,
-    );
-  }
-
-  const result = await prisma.user.update({
-    where: { id: userId },
-    data: {
-      email: data.email,
-      phone: data.phone,
-      profileImage: data.profileImage,
-      provinceId: data.provinceId,
-      districtId: data.districtId,
-      address: data.address,
-    },
-    include: {
-      province: true,
-      district: true,
-    },
-  });
-
-  const { password, ...userWithoutPassword } = result;
-  return userWithoutPassword;
-};
 
 export const changePasswordService = async (data: UpdatePasswordSchema) => {
   const user = await prisma.user.findUnique({

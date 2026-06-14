@@ -5,9 +5,16 @@ import hpp from "hpp";
 import { rateLimit } from "express-rate-limit";
 import { errorNotFound, globalErrorHandler } from "@middleware/error-handler";
 import authRouter from "./features/auth/auth.route";
-import publicRouter from "./features/public/public.route";
 import provinceRouter from "./features/province/province.route";
 import districtRouter from "./features/district/district.route";
+import citizenRouter from "./features/citizen/citizen.route";
+import policeDepartmentRouter from "./features/police-department/police-department.route";
+import policeDistrictRouter from "./features/police-district/police-district.route";
+import villageChiefRouter from "./features/village-chief/village-chief.route";
+import villageRouter from "./features/village/village.route";
+import newsRouter from "./features/news/news.route";
+import reportRouter from "./features/report/report.route";
+import storageRouter from "./features/storage/storage.route";
 
 
 
@@ -42,9 +49,16 @@ app.use("/api", limiter);
 const ROUTE = "/api/v1";
 
 app.use(`${ROUTE}/auth`, authRouter);;
-app.use(`${ROUTE}/public`, publicRouter);
 app.use(`${ROUTE}/province`, provinceRouter);
 app.use(`${ROUTE}/district`, districtRouter);
+app.use(`${ROUTE}/citizen`, citizenRouter);
+app.use(`${ROUTE}/police-department`, policeDepartmentRouter);
+app.use(`${ROUTE}/police-district`, policeDistrictRouter);
+app.use(`${ROUTE}/village-chief`, villageChiefRouter);
+app.use(`${ROUTE}/village`, villageRouter);
+app.use(`${ROUTE}/news`, newsRouter);
+app.use(`${ROUTE}/report`, reportRouter);
+app.use(`${ROUTE}/storage`, storageRouter);
 
 
 // --- 3. Health Check ---

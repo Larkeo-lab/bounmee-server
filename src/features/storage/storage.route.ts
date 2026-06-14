@@ -30,8 +30,8 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
 
-// Image routes - Protected
-storageRouter.post("/image/upload", authMiddleware, upload.single("image"), errorHandler(storageController.uploadImage));
+// Image routes
+storageRouter.post("/image/upload", upload.single("image"), errorHandler(storageController.uploadImage));
 storageRouter.delete("/image/:filename", authMiddleware, errorHandler(storageController.deleteImage));
 
 // Serving routes

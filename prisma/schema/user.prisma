@@ -1,19 +1,32 @@
 model User {
-  id           String  @id @default(uuid()) @db.Uuid
-  userName     String  @unique @db.VarChar(50)
-  email        String? @unique @db.VarChar(50)
-  phone        String? @unique @db.VarChar(20)
-  profileImage String?
-  password     String? @db.VarChar(255) // Hashed Password (Optional for Firebase users)
-  cartId       String  @db.Uuid
-
+  id         String    @id @default(uuid()) @db.Uuid
+  userName   String    @unique @db.VarChar(50)
+  email      String?   @unique @db.VarChar(50)
+  phone      String?   @unique @db.VarChar(20)
+  password   String?   @db.VarChar(255) // Hashed Password (Optional for Firebase users)
   provinceId String?   @db.Uuid
   province   Province? @relation(fields: [provinceId], references: [id])
   districtId String?   @db.Uuid
   district   District? @relation(fields: [districtId], references: [id])
+  villageId  String?   @db.Uuid
+  village    Village?  @relation(fields: [villageId], references: [id])
   address    String?
 
-  role      UserRole @default(CITIZEN)
+  policeDepartmentId String?           @db.Uuid
+  policeDepartment   PoliceDepartment? @relation(fields: [policeDepartmentId], references: [id])
+
+  citizenId String?  @db.Uuid
+  citizen   Citizen? @relation(fields: [citizenId], references: [id])
+
+  policeDistrictId String?         @db.Uuid
+  policeDistrict   PoliceDistrict? @relation(fields: [policeDistrictId], references: [id])
+
+  villageChiefId String?       @db.Uuid
+  villageChief   VillageChief? @relation(fields: [villageChiefId], references: [id])
+
+  report Report[]
+
+  userType  UserType @default(CITIZEN)
   isActive  Boolean  @default(true)
   storeId   String?  @db.Uuid
   createdAt DateTime @default(now())
@@ -22,9 +35,9 @@ model User {
   @@map("user")
 }
 
-enum UserRole {
-  CITIZEN // ປະຊາຊົນ
-  VILLAGE_CHIEF // ນາຍບ້ານ
+enum UserType {
   POLICE_DEPARTMENT // ກົມໃຫຍ່ຕຳລວດ (ຫຼື POLICE_GENERAL_DEPARTMENT)
-  USER // ຜູ້ໃຊ້ງານ (ທົ່ວໄປ)
+  DISTRICT_POLICE // ຕຳລວດເມືອງ
+  VILLAGE_CHIEF // ນາຍບ້ານ
+  CITIZEN // ປະຊາຊົນ
 }

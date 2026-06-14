@@ -1,0 +1,25 @@
+model Citizen {
+    id            String   @id @default(uuid()) @db.Uuid
+    firstName     String   @db.VarChar(50)
+    lastName      String   @db.VarChar(50)
+    dateOfBirth   DateTime @db.Date
+    gender        Gender   @default(MALE)
+    cartNumber    String   @db.VarChar(20)
+    profileImage  String?  @db.VarChar(255)
+    cartImage     String   @db.VarChar(255)
+    cartImageBack String?  @db.VarChar(255)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    createdBy     String?  @db.VarChar(100)
+    updatedBy     String?  @db.VarChar(100)
+
+    users User[]
+
+    @@map("citizens")
+}
+
+enum Gender {
+    MALE
+    FEMALE
+    OTHER
+}

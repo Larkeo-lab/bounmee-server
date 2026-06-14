@@ -1,0 +1,55 @@
+model Report {
+    id          String  @id @default(uuid()) @db.Uuid
+    title       String
+    description String? @db.Text
+
+    provinceId String?   @db.Uuid
+    province   Province? @relation(fields: [provinceId], references: [id])
+    districtId String?   @db.Uuid
+    district   District? @relation(fields: [districtId], references: [id])
+    villageId  String?   @db.Uuid
+    village    Village?  @relation(fields: [villageId], references: [id])
+    location   String    @db.Text
+
+    image String? @db.Text
+    video String? @db.Text
+
+    userId String @db.Uuid
+    user   User   @relation(fields: [userId], references: [id])
+
+    attachments     Json?
+    status          ReportStatus @default(PENDING)
+    currentAssignee UserType     @default(VILLAGE_CHIEF)
+
+    history ReportHistory[]
+
+    createdAt DateTime @default(now()) @db.Timestamp(6)
+    updatedAt DateTime @updatedAt @db.Timestamp(6)
+
+    @@map("report")
+}
+
+// Escalation / assignment trail — one row per time a report moves between levels
+model ReportHistory {
+    id       String @id @default(uuid()) @db.Uuid
+    reportId String @db.Uuid
+    report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+    fromAssignee UserType?
+    toAssignee   UserType
+
+    byUserId String? @db.Uuid
+    note     String? @db.Text
+
+    createdAt DateTime @default(now()) @db.Timestamp(6)
+
+    @@map("report_history")
+}
+
+enum ReportStatus {
+    PENDING // ລໍຖ້າດຳເນີນການ
+    IN_PROGRESS // ກຳລັງດຳເນີນການ
+    REJECTED // ປະຕິເສດ
+    APPROVED // ອະນຸມັດ
+    CANCELLED // ຍົກເລີກ
+}

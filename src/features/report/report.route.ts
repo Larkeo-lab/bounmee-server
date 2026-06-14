@@ -1,0 +1,16 @@
+import { authMiddleware } from "@src/shared/middleware/auth-middleware";
+import { errorHandler } from "@src/shared/middleware/error-handler";
+import { Router } from "express";
+import reportController from "./report.controller";
+
+const router: Router = Router();
+
+// === Report CRUD Routes ===
+router.post("/", authMiddleware, errorHandler(reportController.createReport));
+router.get("/", authMiddleware, errorHandler(reportController.getAllReports));
+router.get("/:id", authMiddleware, errorHandler(reportController.getReportById));
+router.put("/:id", authMiddleware, errorHandler(reportController.updateReport));
+router.put("/:id/forward", authMiddleware, errorHandler(reportController.forwardReport));
+router.delete("/:id", authMiddleware, errorHandler(reportController.deleteReport));
+
+export default router;

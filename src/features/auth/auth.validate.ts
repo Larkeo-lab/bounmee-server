@@ -1,4 +1,5 @@
 import z from "zod";
+import { Gender } from "@prisma/client";
 
 export const registerSchema = z.object({
   userName: z.string().min(1, "Username is required"),
@@ -8,7 +9,20 @@ export const registerSchema = z.object({
   profileImage: z.string().optional().nullable(),
   provinceId: z.string().uuid().optional().nullable(),
   districtId: z.string().uuid().optional().nullable(),
+  villageId: z.string().uuid().optional().nullable(),
   address: z.string().optional().nullable(),
+
+  // Citizen fields
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  dateOfBirth: z.coerce.date(),
+  gender: z.preprocess(
+    (val) => (typeof val === "string" ? val.toUpperCase() : val),
+    z.nativeEnum(Gender)
+  ),
+  cartNumber: z.string().min(1, "Cart number is required"),
+  cartImage: z.string().min(1, "Cart image is required"),
+  cartImageBack: z.string().optional().nullable(),
 });
 
 export const loginSchema = z.object({

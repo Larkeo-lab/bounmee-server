@@ -51,6 +51,13 @@ export const storageController = {
 
   viewImage: (req: Request, res: Response) => {
     const { size, filename } = req.params;
+
+    // When using S3, files live on the bucket — redirect to the public URL
+    // instead of looking on local disk (which only holds legacy/local uploads).
+    if (envData.STORAGE_TYPE === "S3" && envData.S3_PUBLIC_URL) {
+      return res.redirect(`${envData.S3_PUBLIC_URL}/${size}/${filename}`);
+    }
+
     const filePath = path.join(process.cwd(), "src/shared/uploads", size, filename);
 
     if (fs.existsSync(filePath)) {

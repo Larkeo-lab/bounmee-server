@@ -8,6 +8,7 @@ model Province {
     createdBy String?  @db.VarChar(100)
     updatedBy String?  @db.VarChar(100)
     users     User[]
+    reports   Report[]
 
     @@map("provinces")
 }
