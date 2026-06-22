@@ -209,6 +209,16 @@ export const getVillageReportsService = async (villageId: string) => {
     );
   }
 
+  // Village chief office account linked to this village (if any)
+  const villageUser = await prisma.user.findFirst({
+    where: {
+      villageId: village.id,
+      userType: "VILLAGE_CHIEF",
+      isActive: true,
+    },
+    include: { villageChief: true },
+  });
+
   const reports = await prisma.report.findMany({
     where: { villageId },
     include: {
@@ -230,7 +240,14 @@ export const getVillageReportsService = async (villageId: string) => {
   });
 
   return {
-    village,
+    village: {
+      ...village,
+      chiefName: villageUser?.villageChief?.chiefName || "",
+      deputyChiefName: villageUser?.villageChief?.deputyChiefName || "",
+      phone: villageUser?.phone || "",
+      email: villageUser?.email || "",
+      address: villageUser?.address || "",
+    },
     reports,
     total: reports.length,
   };
