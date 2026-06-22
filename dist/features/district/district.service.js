@@ -3,10 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteDistrictService = exports.getAllDistrictsService = void 0;
 exports.getDistrictByIdService = getDistrictByIdService;
 exports.updateDistrictService = updateDistrictService;
-const prisma_1 = require("@config/prisma");
-const bad_request_1 = require("@exceptions/bad-request");
-const not_found_1 = require("@exceptions/not-found");
-const root_1 = require("@exceptions/root");
+const prisma_1 = require("../../config/prisma");
+const bad_request_1 = require("../../shared/exceptions/bad-request");
+const not_found_1 = require("../../shared/exceptions/not-found");
+const root_1 = require("../../shared/exceptions/root");
 // export const createDistrictService = async (
 //   data: DistrictCreateRequest,
 //   createdBy: string,

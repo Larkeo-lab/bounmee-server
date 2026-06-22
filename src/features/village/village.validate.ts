@@ -30,6 +30,12 @@ export const villageCreateSchema = z.object({
     .trim()
     .optional()
     .nullable(),
+  image: z
+    .string()
+    .max(255, "Image must not exceed 255 characters")
+    .trim()
+    .optional()
+    .nullable(),
   createdBy: z.string().trim().optional(),
 });
 
@@ -61,6 +67,12 @@ export const villageUpdateSchema = z.object({
   provinceCode: z
     .string()
     .max(100, "Province code must not exceed 100 characters")
+    .trim()
+    .optional()
+    .nullable(),
+  image: z
+    .string()
+    .max(255, "Image must not exceed 255 characters")
     .trim()
     .optional()
     .nullable(),

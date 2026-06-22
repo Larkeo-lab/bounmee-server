@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const common_validate_1 = require("@src/shared/validations/common.validate");
-const response_format_1 = require("@utils/response-format");
+const common_validate_1 = require("../../shared/validations/common.validate");
+const response_format_1 = require("../../shared/utils/response-format");
 const district_service_1 = require("./district.service");
 const district_validate_1 = require("./district.validate");
 const districtController = {

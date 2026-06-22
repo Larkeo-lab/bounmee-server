@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PublicController = void 0;
-const response_format_1 = require("@src/shared/utils/response-format");
+const response_format_1 = require("../../shared/utils/response-format");
 const public_service_1 = require("./public.service");
 const zod_1 = __importDefault(require("zod"));
 const QrSchema = zod_1.default.object({ qrCode: zod_1.default.string() });

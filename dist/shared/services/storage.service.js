@@ -9,7 +9,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 // @ts-ignore
 const sharp_1 = __importDefault(require("sharp"));
-const env_1 = require("@src/config/env");
+const env_1 = require("../../config/env");
 const s3Client = env_1.envData.STORAGE_TYPE === "S3" ? new client_s3_1.S3Client({
     region: env_1.envData.S3_REGION || "ap-southeast-1",
     credentials: {

@@ -3,14 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.changePasswordService = exports.updateProfileService = exports.refreshTokenService = exports.loginService = exports.registerService = void 0;
-const prisma_1 = require("@config/prisma");
-const crypto_1 = require("crypto");
+exports.changePasswordService = exports.refreshTokenService = exports.loginService = exports.registerService = void 0;
+const prisma_1 = require("../../config/prisma");
 const bcryptjs_1 = require("bcryptjs");
-const jwt_1 = __importDefault(require("@src/shared/utils/jwt"));
-const not_found_1 = require("@exceptions/not-found");
-const root_1 = require("@exceptions/root");
-const bad_request_1 = require("@src/shared/exceptions/bad-request");
+const jwt_1 = __importDefault(require("../../shared/utils/jwt"));
+const not_found_1 = require("../../shared/exceptions/not-found");
+const root_1 = require("../../shared/exceptions/root");
+const bad_request_1 = require("../../shared/exceptions/bad-request");
 const registerService = async (data) => {
     const hashedPassword = (0, bcryptjs_1.hashSync)(data.password, 10);
     // Check if username, email, or phone is already registered
@@ -36,8 +35,18 @@ const registerService = async (data) => {
         }
         throw new bad_request_1.BadRequestException(root_1.ErrorMessages.USER_ALREADY_EXISTS, root_1.ErrorCode.USER_ALREADY_EXISTS, { duplicatedField });
     }
-    // Generate cartId as required by user.prisma
-    const cartId = (0, crypto_1.randomUUID)();
+    // Create Citizen record first
+    const citizen = await prisma_1.prisma.citizen.create({
+        data: {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            dateOfBirth: data.dateOfBirth,
+            gender: data.gender,
+            cartNumber: data.cartNumber,
+            cartImage: data.cartImage,
+            cartImageBack: data.cartImageBack,
+        },
+    });
     const user = await prisma_1.prisma.user.create({
         data: {
             userName: data.userName,
@@ -47,22 +56,25 @@ const registerService = async (data) => {
             profileImage: data.profileImage || null,
             provinceId: data.provinceId || null,
             districtId: data.districtId || null,
+            villageId: data.villageId || null,
             address: data.address || null,
-            cartId: cartId,
-            role: "CITIZEN", // Default role for registered users
+            citizenId: citizen.id,
+            userType: "CITIZEN", // Default userType for registered citizens
         },
         include: {
             province: true,
             district: true,
+            village: true,
+            citizen: true,
         },
     });
     const accessToken = jwt_1.default.sign({
         userId: user.id,
-        role: user.role,
+        role: user.userType,
     });
     const refreshToken = jwt_1.default.signRefreshToken({
         userId: user.id,
-        role: user.role,
+        role: user.userType,
     });
     const { password, ...userWithoutPassword } = user;
     return {
@@ -84,6 +96,8 @@ const loginService = async (data) => {
         include: {
             province: true,
             district: true,
+            citizen: true,
+            policeDepartment: true,
         },
     });
     if (!user) {
@@ -98,11 +112,11 @@ const loginService = async (data) => {
     }
     const accessToken = jwt_1.default.sign({
         userId: user.id,
-        role: user.role,
+        role: user.userType,
     });
     const refreshToken = jwt_1.default.signRefreshToken({
         userId: user.id,
-        role: user.role,
+        role: user.userType,
     });
     const { password, ...userWithoutPassword } = user;
     return { user: userWithoutPassword, accessToken, refreshToken };
@@ -122,32 +136,6 @@ const refreshTokenService = async (data) => {
     return { accessToken, refreshToken: newRefreshToken };
 };
 exports.refreshTokenService = refreshTokenService;
-const updateProfileService = async (userId, data) => {
-    const user = await prisma_1.prisma.user.findUnique({
-        where: { id: userId },
-    });
-    if (!user) {
-        throw new not_found_1.NotFoundException(root_1.ErrorMessages.USER_NOT_FOUND, root_1.ErrorCode.USER_NOT_FOUND);
-    }
-    const result = await prisma_1.prisma.user.update({
-        where: { id: userId },
-        data: {
-            email: data.email,
-            phone: data.phone,
-            profileImage: data.profileImage,
-            provinceId: data.provinceId,
-            districtId: data.districtId,
-            address: data.address,
-        },
-        include: {
-            province: true,
-            district: true,
-        },
-    });
-    const { password, ...userWithoutPassword } = result;
-    return userWithoutPassword;
-};
-exports.updateProfileService = updateProfileService;
 const changePasswordService = async (data) => {
     const user = await prisma_1.prisma.user.findUnique({
         where: { id: data.userId },

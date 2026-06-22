@@ -7,8 +7,8 @@ const express_1 = require("express");
 // @ts-ignore
 const multer_1 = __importDefault(require("multer"));
 const storage_controller_1 = require("./storage.controller");
-const error_handler_1 = require("@src/shared/middleware/error-handler");
-const auth_middleware_1 = require("@src/shared/middleware/auth-middleware");
+const error_handler_1 = require("../../shared/middleware/error-handler");
+const auth_middleware_1 = require("../../shared/middleware/auth-middleware");
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const storageRouter = (0, express_1.Router)();
@@ -31,8 +31,8 @@ const upload = (0, multer_1.default)({
     storage,
     limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
-// Image routes - Protected
-storageRouter.post("/image/upload", auth_middleware_1.authMiddleware, upload.single("image"), (0, error_handler_1.errorHandler)(storage_controller_1.storageController.uploadImage));
+// Image routes
+storageRouter.post("/image/upload", upload.single("image"), (0, error_handler_1.errorHandler)(storage_controller_1.storageController.uploadImage));
 storageRouter.delete("/image/:filename", auth_middleware_1.authMiddleware, (0, error_handler_1.errorHandler)(storage_controller_1.storageController.deleteImage));
 // Serving routes
 storageRouter.get("/view-image/:size/:filename", (0, error_handler_1.errorHandler)(storage_controller_1.storageController.viewImage));

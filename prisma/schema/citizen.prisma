@@ -5,7 +5,6 @@ model Citizen {
     dateOfBirth   DateTime @db.Date
     gender        Gender   @default(MALE)
     cartNumber    String   @db.VarChar(20)
-    profileImage  String?  @db.VarChar(255)
     cartImage     String   @db.VarChar(255)
     cartImageBack String?  @db.VarChar(255)
     createdAt     DateTime @default(now())

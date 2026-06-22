@@ -5,6 +5,7 @@ model Village {
     nameEn       String   @db.VarChar(100)
     districtCode String?  @db.VarChar(100)
     provinceCode String?  @db.VarChar(100)
+    image        String?  @db.VarChar(255)
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
     createdBy    String?  @db.VarChar(100)

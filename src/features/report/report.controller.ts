@@ -7,6 +7,7 @@ import {
   forwardReportService,
   getAllReportsService,
   getReportByIdService,
+  getVillageReportsService,
   updateReportService,
 } from "./report.service";
 import { reportCreateSchema, reportQuerySchema, reportUpdateSchema } from "./report.validate";
@@ -15,6 +16,7 @@ const reportController = {
   createReport,
   getAllReports,
   getReportById,
+  getVillageReports,
   updateReport,
   forwardReport,
   deleteReport,
@@ -30,7 +32,8 @@ async function createReport(req: Request, res: Response) {
 async function getAllReports(req: Request, res: Response) {
   const { page, limit } = paginationSchema.parse(req.query);
   const filters = reportQuerySchema.parse(req.query);
-  const result = await getAllReportsService(page, limit, filters);
+  const loggedInUserId = res.locals.payload?.userId;
+  const result = await getAllReportsService(page, limit, filters, loggedInUserId);
   const { reports, total } = result;
   ResponsePaginationSuccess(res, reports, page, limit, total);
 }
@@ -38,6 +41,12 @@ async function getAllReports(req: Request, res: Response) {
 async function getReportById(req: Request, res: Response) {
   const { id } = idSchema.parse(req.params);
   const result = await getReportByIdService(id);
+  ResponseSuccess(res, result);
+}
+
+async function getVillageReports(req: Request, res: Response) {
+  const villageId = req.params.villageId;
+  const result = await getVillageReportsService(villageId);
   ResponseSuccess(res, result);
 }
 

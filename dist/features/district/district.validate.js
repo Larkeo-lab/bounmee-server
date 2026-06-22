@@ -22,6 +22,7 @@ exports.districtCreateSchema = zod_1.z.object({
         .string()
         .uuid("Invalid province ID format")
         .min(1, "Province ID is required"),
+    image: zod_1.z.string().max(255).optional().nullable(),
     createdBy: zod_1.z.string().trim().optional(),
 });
 // District Update Schema
@@ -44,6 +45,7 @@ exports.districtUpdateSchema = zod_1.z.object({
         .trim()
         .optional(),
     provinceId: zod_1.z.string().uuid("Invalid province ID format").optional(),
+    image: zod_1.z.string().max(255).optional().nullable(),
     updatedBy: zod_1.z.string().trim().optional(),
 });
 exports.querySchema = zod_1.z.object({

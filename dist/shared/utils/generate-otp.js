@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.calculateExpiration = exports.generateOTP = void 0;
-const env_1 = require("@config/env");
+const env_1 = require("../../config/env");
 const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
 };

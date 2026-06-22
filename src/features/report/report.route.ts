@@ -8,6 +8,11 @@ const router: Router = Router();
 // === Report CRUD Routes ===
 router.post("/", authMiddleware, errorHandler(reportController.createReport));
 router.get("/", authMiddleware, errorHandler(reportController.getAllReports));
+router.get(
+  "/village/:villageId",
+  authMiddleware,
+  errorHandler(reportController.getVillageReports),
+);
 router.get("/:id", authMiddleware, errorHandler(reportController.getReportById));
 router.put("/:id", authMiddleware, errorHandler(reportController.updateReport));
 router.put("/:id/forward", authMiddleware, errorHandler(reportController.forwardReport));

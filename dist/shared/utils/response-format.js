@@ -13,7 +13,7 @@ exports.ResponseSuccess = ResponseSuccess;
 const ResponsePaginationSuccess = (res, data, page, limit, total, statusCode = 200, extraData) => {
     const totalPages = Math.ceil(total / limit);
     res.status(statusCode).json({
-        code: `POS-${statusCode}`,
+        code: `${statusCode}`,
         message: "SUCCESS",
         data,
         pagination: {
@@ -28,7 +28,7 @@ const ResponsePaginationSuccess = (res, data, page, limit, total, statusCode = 2
 exports.ResponsePaginationSuccess = ResponsePaginationSuccess;
 const ResponseManyDataSuccess = (res, data, statusCode = 200) => {
     res.status(statusCode).json({
-        code: `POS-${statusCode}`,
+        code: `${statusCode}`,
         message: "SUCCESS",
         data,
     });

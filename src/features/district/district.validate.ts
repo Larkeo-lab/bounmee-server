@@ -20,6 +20,7 @@ export const districtCreateSchema = z.object({
     .string()
     .uuid("Invalid province ID format")
     .min(1, "Province ID is required"),
+  image: z.string().max(255).optional().nullable(),
   createdBy: z.string().trim().optional(),
 });
 
@@ -43,6 +44,7 @@ export const districtUpdateSchema = z.object({
     .trim()
     .optional(),
   provinceId: z.string().uuid("Invalid province ID format").optional(),
+  image: z.string().max(255).optional().nullable(),
   updatedBy: z.string().trim().optional(),
 });
 

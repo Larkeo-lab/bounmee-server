@@ -3,10 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteProvinceService = exports.getAllProvincesService = exports.createProvinceService = void 0;
 exports.getProvinceByIdService = getProvinceByIdService;
 exports.updateProvinceService = updateProvinceService;
-const prisma_1 = require("@config/prisma");
-const bad_request_1 = require("@exceptions/bad-request");
-const not_found_1 = require("@exceptions/not-found");
-const root_1 = require("@exceptions/root");
+const prisma_1 = require("../../config/prisma");
+const bad_request_1 = require("../../shared/exceptions/bad-request");
+const not_found_1 = require("../../shared/exceptions/not-found");
+const root_1 = require("../../shared/exceptions/root");
 const createProvinceService = async (data, updatedBy) => {
     const existingCode = await prisma_1.prisma.province.findUnique({
         where: { code: data.code },

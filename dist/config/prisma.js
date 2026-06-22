@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.connectDatabase = exports.prisma = void 0;
 const adapter_pg_1 = require("@prisma/adapter-pg");
 const client_1 = require("@prisma/client");
-const env_1 = require("@src/config/env");
+const env_1 = require("../config/env");
 const pg_1 = __importDefault(require("pg"));
 const globalForPrisma = globalThis;
 const connectionString = env_1.envData.DATABASE_URL;

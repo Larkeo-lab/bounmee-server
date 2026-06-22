@@ -102,6 +102,7 @@ export const getAllReportsService = async (
   page: number,
   limit: number,
   filters: ReportQueryRequest,
+  loggedInUserId?: string,
 ) => {
   const skip = (page - 1) * limit;
 
@@ -120,20 +121,40 @@ export const getAllReportsService = async (
     where.history = { some: { toAssignee: filters.reachedAssignee } };
   }
 
-  if (filters.provinceId) {
-    where.provinceId = filters.provinceId;
-  }
+  // Geographic / owner scope is ENFORCED from the logged-in user (not trusted
+  // from client filters), based on their userType:
+  //   POLICE_DEPARTMENT → province, DISTRICT_POLICE → district,
+  //   VILLAGE_CHIEF → village, CITIZEN → only their own reports.
+  if (loggedInUserId) {
+    const me = await prisma.user.findUnique({
+      where: { id: loggedInUserId },
+      select: {
+        id: true,
+        userType: true,
+        provinceId: true,
+        districtId: true,
+        villageId: true,
+      },
+    });
 
-  if (filters.districtId) {
-    where.districtId = filters.districtId;
-  }
-
-  if (filters.villageId) {
-    where.villageId = filters.villageId;
-  }
-
-  if (filters.userId) {
-    where.userId = filters.userId;
+    if (me) {
+      if (me.userType === "POLICE_DEPARTMENT") {
+        if (me.provinceId) where.provinceId = me.provinceId;
+      } else if (me.userType === "DISTRICT_POLICE") {
+        if (me.districtId) where.districtId = me.districtId;
+      } else if (me.userType === "VILLAGE_CHIEF") {
+        if (me.villageId) where.villageId = me.villageId;
+      } else {
+        // CITIZEN (and any other) only sees their own reports
+        where.userId = me.id;
+      }
+    }
+  } else {
+    // No authenticated user → fall back to explicit client filters
+    if (filters.provinceId) where.provinceId = filters.provinceId;
+    if (filters.districtId) where.districtId = filters.districtId;
+    if (filters.villageId) where.villageId = filters.villageId;
+    if (filters.userId) where.userId = filters.userId;
   }
 
   if (filters.search) {
@@ -172,6 +193,46 @@ export const getAllReportsService = async (
   return {
     reports,
     total,
+  };
+};
+
+// All reports for one village (+ the village info for the page header)
+export const getVillageReportsService = async (villageId: string) => {
+  const village = await prisma.village.findUnique({
+    where: { id: villageId },
+  });
+
+  if (!village) {
+    throw new NotFoundException(
+      ErrorMessages.VILLAGE_NOT_FOUND,
+      ErrorCode.VILLAGE_NOT_FOUND,
+    );
+  }
+
+  const reports = await prisma.report.findMany({
+    where: { villageId },
+    include: {
+      province: true,
+      district: true,
+      village: true,
+      user: {
+        select: {
+          id: true,
+          userName: true,
+          email: true,
+          phone: true,
+          userType: true,
+        },
+      },
+      history: { orderBy: { createdAt: "asc" } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return {
+    village,
+    reports,
+    total: reports.length,
   };
 };
 

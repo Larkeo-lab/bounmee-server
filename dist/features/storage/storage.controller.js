@@ -6,11 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.storageController = void 0;
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const response_format_1 = require("@src/shared/utils/response-format");
-const bad_request_1 = require("@src/shared/exceptions/bad-request");
-const root_1 = require("@src/shared/exceptions/root");
-const storage_service_1 = require("@src/shared/services/storage.service");
-const env_1 = require("@src/config/env");
+const response_format_1 = require("../../shared/utils/response-format");
+const bad_request_1 = require("../../shared/exceptions/bad-request");
+const root_1 = require("../../shared/exceptions/root");
+const storage_service_1 = require("../../shared/services/storage.service");
+const env_1 = require("../../config/env");
 exports.storageController = {
     uploadImage: async (req, res) => {
         // @ts-ignore
@@ -47,6 +47,11 @@ exports.storageController = {
     },
     viewImage: (req, res) => {
         const { size, filename } = req.params;
+        // When using S3, files live on the bucket — redirect to the public URL
+        // instead of looking on local disk (which only holds legacy/local uploads).
+        if (env_1.envData.STORAGE_TYPE === "S3" && env_1.envData.S3_PUBLIC_URL) {
+            return res.redirect(`${env_1.envData.S3_PUBLIC_URL}/${size}/${filename}`);
+        }
         const filePath = path_1.default.join(process.cwd(), "src/shared/uploads", size, filename);
         if (fs_1.default.existsSync(filePath)) {
             res.sendFile(filePath);

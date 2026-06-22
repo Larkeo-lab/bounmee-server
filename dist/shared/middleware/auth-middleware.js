@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkEmployee = exports.checkStore = exports.authMiddleware = exports.Role = void 0;
-const jwt_1 = __importDefault(require("@utils/jwt"));
+const jwt_1 = __importDefault(require("../utils/jwt"));
 const jsonwebtoken_1 = require("jsonwebtoken");
 const root_1 = require("../exceptions/root");
 const unauthorized_1 = require("../exceptions/unauthorized");

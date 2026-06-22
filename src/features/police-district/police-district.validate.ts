@@ -15,16 +15,20 @@ export const policeDistrictCreateSchema = z.object({
     .min(1, "Deputy chief name is required")
     .max(100, "Deputy chief name must not exceed 100 characters")
     .trim(),
+  image: z.string().max(255).optional().nullable(),
+  bgImage: z.string().max(255).optional().nullable(),
 
   // --- User account info (User is the central account table) ---
   userName: z.string().min(1, "Username is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   email: z.string().email("Invalid email").optional().nullable(),
   phone: z.string().optional().nullable(),
-  provinceId: z.string().uuid().optional().nullable(),
-  districtId: z.string().uuid().optional().nullable(),
-  villageId: z.string().uuid().optional().nullable(),
+  // Location is given by CODE (resolved to ids on the server)
+  provinceCode: z.string().optional().nullable(),
+  districtCode: z.string().optional().nullable(),
+  villageCode: z.string().optional().nullable(),
   address: z.string().optional().nullable(),
+  profileImage: z.string().optional().nullable(),
 
   createdBy: z.string().trim().optional(),
 });
@@ -43,16 +47,23 @@ export const policeDistrictUpdateSchema = z.object({
     .max(100, "Deputy chief name must not exceed 100 characters")
     .trim()
     .optional(),
+  image: z.string().max(255).optional().nullable(),
+  bgImage: z.string().max(255).optional().nullable(),
 
   // --- Linked User account fields (optional on update) ---
   userName: z.string().min(1, "Username is required").optional(),
-  password: z.string().min(6, "Password must be at least 6 characters").optional(),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .optional(),
   email: z.string().email("Invalid email").optional().nullable(),
   phone: z.string().optional().nullable(),
-  provinceId: z.string().uuid().optional().nullable(),
-  districtId: z.string().uuid().optional().nullable(),
-  villageId: z.string().uuid().optional().nullable(),
+  // Location is given by CODE (resolved to ids on the server)
+  provinceCode: z.string().optional().nullable(),
+  districtCode: z.string().optional().nullable(),
+  villageCode: z.string().optional().nullable(),
   address: z.string().optional().nullable(),
+  profileImage: z.string().optional().nullable(),
 
   updatedBy: z.string().trim().optional(),
 });

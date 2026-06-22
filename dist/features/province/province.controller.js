@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const province_validate_1 = require("./province.validate");
-const response_format_1 = require("@utils/response-format");
+const response_format_1 = require("../../shared/utils/response-format");
 const province_service_1 = require("./province.service");
-const common_validate_1 = require("@src/shared/validations/common.validate");
+const common_validate_1 = require("../../shared/validations/common.validate");
 const provinceController = {
     createProvince,
     getAllProvinces,

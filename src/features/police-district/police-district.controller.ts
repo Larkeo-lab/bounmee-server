@@ -6,11 +6,15 @@ import {
 import {
   ResponseSuccess,
   ResponsePaginationSuccess,
+  ResponseManyDataSuccess,
 } from "@utils/response-format";
 import {
   createPoliceDistrictService,
   deletePoliceDistrictService,
+  getAllPoliceDepartmentsAndReportService,
+  getAllPoliceDistrictsAndReportService,
   getAllPoliceDistrictsService,
+  getPoliceDistrictByIdAndReportService,
   getPoliceDistrictByIdService,
   updatePoliceDistrictService,
 } from "./police-district.service";
@@ -25,6 +29,9 @@ const policeDistrictController = {
   getPoliceDistrictById,
   updatePoliceDistrict,
   deletePoliceDistrict,
+  policeDistrictAndReportList,
+  policeDepartmentAndReportList,
+  getPoliceDistrictByIdAndReport,
 };
 
 async function createPoliceDistrict(req: Request, res: Response) {
@@ -51,13 +58,35 @@ async function updatePoliceDistrict(req: Request, res: Response) {
   const { id } = idSchema.parse(req.params);
   const validatedData = policeDistrictUpdateSchema.parse(req.body);
   const updatedBy = res.locals.payload?.userId || "system";
-  const result = await updatePoliceDistrictService(id, validatedData, updatedBy);
+  const result = await updatePoliceDistrictService(
+    id,
+    validatedData,
+    updatedBy,
+  );
   ResponseSuccess(res, result);
 }
 
 async function deletePoliceDistrict(req: Request, res: Response) {
   const { id } = idSchema.parse(req.params);
   const result = await deletePoliceDistrictService(id);
+  ResponseSuccess(res, result);
+}
+
+async function policeDepartmentAndReportList(req: Request, res: Response) {
+  const userId = res.locals.payload?.userId || "";
+  const result = await getAllPoliceDepartmentsAndReportService(userId);
+  ResponseManyDataSuccess(res, result);
+}
+
+async function policeDistrictAndReportList(req: Request, res: Response) {
+  const userId = res.locals.payload?.userId || "";
+  const result = await getAllPoliceDistrictsAndReportService(userId);
+  ResponseManyDataSuccess(res, result);
+}
+
+async function getPoliceDistrictByIdAndReport(req: Request, res: Response) {
+  const { id } = idSchema.parse(req.params);
+  const result = await getPoliceDistrictByIdAndReportService(id);
   ResponseSuccess(res, result);
 }
 
