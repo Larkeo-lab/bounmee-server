@@ -65,7 +65,9 @@ export const createReportService = async (data: ReportCreateRequest, userId: str
       video: data.video,
       attachments: data.attachments || null,
       status: data.status,
-      currentAssignee: data.currentAssignee,
+      // A report starts at the citizen level; the village chief "ຮັບເລື່ອງ"
+      // advances it to VILLAGE_CHIEF (step 2).
+      currentAssignee: data.currentAssignee || "CITIZEN",
       userId,
     },
     include: {
@@ -141,7 +143,9 @@ export const getAllReportsService = async (
       if (me.userType === "POLICE_DEPARTMENT") {
         if (me.provinceId) where.provinceId = me.provinceId;
       } else if (me.userType === "DISTRICT_POLICE") {
+        // Only reports that the village chief has forwarded up (reached district)
         if (me.districtId) where.districtId = me.districtId;
+        where.currentAssignee = { in: ["DISTRICT_POLICE", "POLICE_DEPARTMENT"] };
       } else if (me.userType === "VILLAGE_CHIEF") {
         if (me.villageId) where.villageId = me.villageId;
       } else {
@@ -282,6 +286,7 @@ export const getReportByIdService = async (id: string) => {
 
 // Escalation chain: village chief → district police → department
 const NEXT_ASSIGNEE: Record<string, string | undefined> = {
+  CITIZEN: "VILLAGE_CHIEF", // village chief "ຮັບເລື່ອງ" (receives the case)
   VILLAGE_CHIEF: "DISTRICT_POLICE",
   DISTRICT_POLICE: "POLICE_DEPARTMENT",
 };
@@ -310,7 +315,8 @@ export const forwardReportService = async (id: string, byUserId: string) => {
       where: { id },
       data: {
         currentAssignee: next as any,
-        status: "IN_PROGRESS",
+        // Delivered to the next level but not yet received → PENDING
+        status: "PENDING",
       },
       include: {
         province: true,
@@ -329,6 +335,107 @@ export const forwardReportService = async (id: string, byUserId: string) => {
         toAssignee: next as any,
         byUserId,
         note: "Forwarded",
+      },
+    }),
+  ]);
+
+  return updated;
+};
+
+const REPORT_INCLUDE = {
+  province: true,
+  district: true,
+  village: true,
+  user: {
+    select: { id: true, userName: true, email: true, phone: true, userType: true },
+  },
+  history: { orderBy: { createdAt: "asc" as const } },
+};
+
+// "ຮັບເລື່ອງ" — VILLAGE_CHIEF / DISTRICT_POLICE acknowledges they are handling it.
+// If the report sits at a lower level, it is pulled up to the receiver's level.
+export const receiveReportService = async (id: string, userId: string) => {
+  const actor = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { userType: true },
+  });
+  const level = actor?.userType;
+
+  if (level !== "VILLAGE_CHIEF" && level !== "DISTRICT_POLICE") {
+    throw new BadRequestException(
+      ErrorMessages.SOMETHING_WENT_WRONG,
+      ErrorCode.SOMETHING_WENT_WRONG,
+      "Only village chief or district police can receive a report",
+    );
+  }
+
+  const report = await prisma.report.findUnique({
+    where: { id },
+    select: { id: true, currentAssignee: true },
+  });
+  if (!report) {
+    throw new NotFoundException(
+      ErrorMessages.REPORT_NOT_FOUND,
+      ErrorCode.REPORT_NOT_FOUND,
+    );
+  }
+
+  const changedLevel = report.currentAssignee !== level;
+
+  const ops: any[] = [
+    prisma.report.update({
+      where: { id },
+      data: {
+        status: "IN_PROGRESS",
+        ...(changedLevel ? { currentAssignee: level } : {}),
+      },
+      include: REPORT_INCLUDE,
+    }),
+  ];
+  if (changedLevel) {
+    ops.push(
+      prisma.reportHistory.create({
+        data: {
+          reportId: id,
+          fromAssignee: report.currentAssignee,
+          toAssignee: level,
+          byUserId: userId,
+          note: "Received",
+        },
+      }),
+    );
+  }
+
+  const [updated] = await prisma.$transaction(ops);
+  return updated;
+};
+
+// "ແກ້ໄຂສຳເລັດ" — mark the report resolved (citizen then sees it as resolved).
+export const resolveReportService = async (id: string, userId: string) => {
+  const report = await prisma.report.findUnique({
+    where: { id },
+    select: { id: true, currentAssignee: true },
+  });
+  if (!report) {
+    throw new NotFoundException(
+      ErrorMessages.REPORT_NOT_FOUND,
+      ErrorCode.REPORT_NOT_FOUND,
+    );
+  }
+
+  const [updated] = await prisma.$transaction([
+    prisma.report.update({
+      where: { id },
+      data: { status: "APPROVED" },
+      include: REPORT_INCLUDE,
+    }),
+    prisma.reportHistory.create({
+      data: {
+        reportId: id,
+        fromAssignee: report.currentAssignee,
+        toAssignee: report.currentAssignee,
+        byUserId: userId,
+        note: "Resolved",
       },
     }),
   ]);

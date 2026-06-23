@@ -314,6 +314,25 @@ export async function updatePoliceDistrictService(
   });
 }
 
+// Self-profile update: a DISTRICT_POLICE updates their own office (image/bgImage,
+// chief names, account fields) — resolves the police district from the logged-in user.
+export const updateMyPoliceDistrictService = async (
+  userId: string,
+  data: PoliceDistrictUpdateRequest,
+) => {
+  const me = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { policeDistrictId: true },
+  });
+  if (!me?.policeDistrictId) {
+    throw new NotFoundException(
+      ErrorMessages.POLICE_DISTRICT_NOT_FOUND,
+      ErrorCode.POLICE_DISTRICT_NOT_FOUND,
+    );
+  }
+  return updatePoliceDistrictService(me.policeDistrictId, data, userId);
+};
+
 export const deletePoliceDistrictService = async (id: string) => {
   const policeDistrict = await prisma.policeDistrict.findUnique({
     where: { id },

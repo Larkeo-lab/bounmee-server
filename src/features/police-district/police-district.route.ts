@@ -50,6 +50,14 @@ router.get(
   errorHandler(policeDistrictController.getPoliceDistrictById),
 );
 
+// Self-profile: a DISTRICT_POLICE updates their own office
+router.put(
+  "/me",
+  authMiddleware,
+  requireUserType(["DISTRICT_POLICE"]),
+  errorHandler(policeDistrictController.updateMyPoliceDistrict),
+);
+
 router.put(
   "/:id",
   authMiddleware,

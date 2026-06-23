@@ -12,6 +12,7 @@ import {
   deleteVillageChiefService,
   getAllVillageChiefsService,
   getVillageChiefByIdService,
+  updateMyVillageChiefService,
   updateVillageChiefService,
 } from "./village-chief.service";
 import {
@@ -24,6 +25,7 @@ const villageChiefController = {
   getAllVillageChiefs,
   getVillageChiefById,
   updateVillageChief,
+  updateMyVillageChief,
   deleteVillageChief,
 };
 
@@ -52,6 +54,13 @@ async function updateVillageChief(req: Request, res: Response) {
   const validatedData = villageChiefUpdateSchema.parse(req.body);
   const updatedBy = res.locals.payload?.userId || "system";
   const result = await updateVillageChiefService(id, validatedData, updatedBy);
+  ResponseSuccess(res, result);
+}
+
+async function updateMyVillageChief(req: Request, res: Response) {
+  const userId = res.locals.payload?.userId;
+  const validatedData = villageChiefUpdateSchema.parse(req.body);
+  const result = await updateMyVillageChiefService(userId, validatedData);
   ResponseSuccess(res, result);
 }
 

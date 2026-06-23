@@ -94,14 +94,28 @@ export async function updateCitizenService(
     }
   }
 
-  return await prisma.citizen.update({
+  const { profileImage, ...citizenData } = data;
+
+  const updatedCitizen = await prisma.citizen.update({
     where: { id },
     data: {
-      ...data,
-      gender: data.gender as Gender | undefined,
+      ...citizenData,
+      gender: citizenData.gender as Gender | undefined,
       updatedBy,
     },
   });
+
+  if (profileImage !== undefined) {
+    await prisma.user.updateMany({
+      where: { citizenId: id },
+      data: { profileImage },
+    });
+  }
+
+  return {
+    ...updatedCitizen,
+    profileImage,
+  };
 }
 
 export const deleteCitizenService = async (id: string) => {

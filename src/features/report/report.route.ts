@@ -16,6 +16,8 @@ router.get(
 router.get("/:id", authMiddleware, errorHandler(reportController.getReportById));
 router.put("/:id", authMiddleware, errorHandler(reportController.updateReport));
 router.put("/:id/forward", authMiddleware, errorHandler(reportController.forwardReport));
+router.put("/:id/receive", authMiddleware, errorHandler(reportController.receiveReport));
+router.put("/:id/resolve", authMiddleware, errorHandler(reportController.resolveReport));
 router.delete("/:id", authMiddleware, errorHandler(reportController.deleteReport));
 
 export default router;

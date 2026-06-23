@@ -8,6 +8,8 @@ import {
   getAllReportsService,
   getReportByIdService,
   getVillageReportsService,
+  receiveReportService,
+  resolveReportService,
   updateReportService,
 } from "./report.service";
 import { reportCreateSchema, reportQuerySchema, reportUpdateSchema } from "./report.validate";
@@ -19,6 +21,8 @@ const reportController = {
   getVillageReports,
   updateReport,
   forwardReport,
+  receiveReport,
+  resolveReport,
   deleteReport,
 };
 
@@ -61,6 +65,20 @@ async function forwardReport(req: Request, res: Response) {
   const { id } = idSchema.parse(req.params);
   const byUserId = res.locals.payload.userId;
   const result = await forwardReportService(id, byUserId);
+  ResponseSuccess(res, result);
+}
+
+async function receiveReport(req: Request, res: Response) {
+  const { id } = idSchema.parse(req.params);
+  const byUserId = res.locals.payload.userId;
+  const result = await receiveReportService(id, byUserId);
+  ResponseSuccess(res, result);
+}
+
+async function resolveReport(req: Request, res: Response) {
+  const { id } = idSchema.parse(req.params);
+  const byUserId = res.locals.payload.userId;
+  const result = await resolveReportService(id, byUserId);
   ResponseSuccess(res, result);
 }
 

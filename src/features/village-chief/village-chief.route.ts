@@ -29,6 +29,14 @@ router.get(
   errorHandler(villageChiefController.getVillageChiefById),
 );
 
+// Self-profile: a VILLAGE_CHIEF updates their own record
+router.put(
+  "/me",
+  authMiddleware,
+  requireUserType(["VILLAGE_CHIEF"]),
+  errorHandler(villageChiefController.updateMyVillageChief),
+);
+
 router.put(
   "/:id",
   authMiddleware,

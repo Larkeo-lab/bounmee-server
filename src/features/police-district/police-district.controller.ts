@@ -16,6 +16,7 @@ import {
   getAllPoliceDistrictsService,
   getPoliceDistrictByIdAndReportService,
   getPoliceDistrictByIdService,
+  updateMyPoliceDistrictService,
   updatePoliceDistrictService,
 } from "./police-district.service";
 import {
@@ -28,6 +29,7 @@ const policeDistrictController = {
   getAllPoliceDistricts,
   getPoliceDistrictById,
   updatePoliceDistrict,
+  updateMyPoliceDistrict,
   deletePoliceDistrict,
   policeDistrictAndReportList,
   policeDepartmentAndReportList,
@@ -63,6 +65,13 @@ async function updatePoliceDistrict(req: Request, res: Response) {
     validatedData,
     updatedBy,
   );
+  ResponseSuccess(res, result);
+}
+
+async function updateMyPoliceDistrict(req: Request, res: Response) {
+  const userId = res.locals.payload?.userId;
+  const validatedData = policeDistrictUpdateSchema.parse(req.body);
+  const result = await updateMyPoliceDistrictService(userId, validatedData);
   ResponseSuccess(res, result);
 }
 

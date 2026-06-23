@@ -44,6 +44,8 @@ export const createVillageChiefService = async (
     data: {
       chiefName: data.chiefName,
       deputyChiefName: data.deputyChiefName,
+      image: data.image || null,
+      bgImage: data.bgImage || null,
       createdBy,
     },
   });
@@ -158,6 +160,8 @@ export async function updateVillageChiefService(
   const {
     chiefName,
     deputyChiefName,
+    image,
+    bgImage,
     userName,
     password,
     email,
@@ -231,6 +235,8 @@ export async function updateVillageChiefService(
     data: {
       ...(chiefName !== undefined ? { chiefName } : {}),
       ...(deputyChiefName !== undefined ? { deputyChiefName } : {}),
+      ...(image !== undefined ? { image: image || null } : {}),
+      ...(bgImage !== undefined ? { bgImage: bgImage || null } : {}),
       updatedBy,
     },
     include: {
@@ -251,6 +257,25 @@ export async function updateVillageChiefService(
     },
   });
 }
+
+// Self-profile update: a VILLAGE_CHIEF updates their own record (image/bgImage,
+// chief names, account fields) — resolves the village chief from the logged-in user.
+export const updateMyVillageChiefService = async (
+  userId: string,
+  data: VillageChiefUpdateRequest,
+) => {
+  const me = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { villageChiefId: true },
+  });
+  if (!me?.villageChiefId) {
+    throw new NotFoundException(
+      ErrorMessages.VILLAGE_CHIEF_NOT_FOUND,
+      ErrorCode.VILLAGE_CHIEF_NOT_FOUND,
+    );
+  }
+  return updateVillageChiefService(me.villageChiefId, data, userId);
+};
 
 export const deleteVillageChiefService = async (id: string) => {
   const villageChief = await prisma.villageChief.findUnique({

@@ -15,6 +15,8 @@ export const villageChiefCreateSchema = z.object({
     .min(1, "Deputy chief name is required")
     .max(100, "Deputy chief name must not exceed 100 characters")
     .trim(),
+  image: z.string().max(255).optional().nullable(),
+  bgImage: z.string().max(255).optional().nullable(),
 
   // --- User account info (User is the central account table) ---
   userName: z.string().min(1, "Username is required"),
@@ -43,6 +45,8 @@ export const villageChiefUpdateSchema = z.object({
     .max(100, "Deputy chief name must not exceed 100 characters")
     .trim()
     .optional(),
+  image: z.string().max(255).optional().nullable(),
+  bgImage: z.string().max(255).optional().nullable(),
 
   // --- Linked User account fields (optional on update) ---
   userName: z.string().min(1, "Username is required").optional(),
