@@ -186,6 +186,7 @@ export const getAllReportsService = async (
           },
         },
         history: { orderBy: { createdAt: "asc" } },
+        reportMoreDetail: { orderBy: { createdAt: "asc" } },
       },
       orderBy: { createdAt: "desc" },
       skip,
@@ -533,4 +534,30 @@ export const deleteReportService = async (id: string) => {
   });
 
   return { id };
+};
+
+// Add an extra-info entry to a report (citizen follow-up: ແຈ້ງຂໍ້ມູນເພີ່ມເຕີມ)
+export const addReportMoreDetailService = async (
+  reportId: string,
+  data: { detail: string; images?: string[]; attachments?: string | null },
+) => {
+  const report = await prisma.report.findUnique({
+    where: { id: reportId },
+    select: { id: true },
+  });
+  if (!report) {
+    throw new NotFoundException(
+      ErrorMessages.REPORT_NOT_FOUND,
+      ErrorCode.REPORT_NOT_FOUND,
+    );
+  }
+
+  return prisma.reportMoreDetail.create({
+    data: {
+      reportId,
+      detail: data.detail,
+      images: data.images || [],
+      attachments: data.attachments || null,
+    },
+  });
 };

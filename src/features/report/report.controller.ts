@@ -2,6 +2,7 @@ import { idSchema, paginationSchema } from "@src/shared/validations/common.valid
 import { ResponsePaginationSuccess, ResponseSuccess } from "@utils/response-format";
 import type { Request, Response } from "express";
 import {
+  addReportMoreDetailService,
   createReportService,
   deleteReportService,
   forwardReportService,
@@ -12,7 +13,12 @@ import {
   resolveReportService,
   updateReportService,
 } from "./report.service";
-import { reportCreateSchema, reportQuerySchema, reportUpdateSchema } from "./report.validate";
+import {
+  reportCreateSchema,
+  reportMoreDetailSchema,
+  reportQuerySchema,
+  reportUpdateSchema,
+} from "./report.validate";
 
 const reportController = {
   createReport,
@@ -20,6 +26,7 @@ const reportController = {
   getReportById,
   getVillageReports,
   updateReport,
+  addReportMoreDetail,
   forwardReport,
   receiveReport,
   resolveReport,
@@ -59,6 +66,13 @@ async function updateReport(req: Request, res: Response) {
   const validatedData = reportUpdateSchema.parse(req.body);
   const result = await updateReportService(id, validatedData);
   ResponseSuccess(res, result);
+}
+
+async function addReportMoreDetail(req: Request, res: Response) {
+  const { id } = idSchema.parse(req.params);
+  const validatedData = reportMoreDetailSchema.parse(req.body);
+  const result = await addReportMoreDetailService(id, validatedData);
+  ResponseSuccess(res, result, 201);
 }
 
 async function forwardReport(req: Request, res: Response) {

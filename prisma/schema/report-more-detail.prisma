@@ -1,0 +1,12 @@
+model ReportMoreDetail {
+    id          String   @id @default(uuid()) @db.Uuid
+    reportId    String   @db.Uuid
+    report      Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+    detail      String   @db.Text
+    attachments String?
+    images      String[]
+    createdAt   DateTime @default(now()) @db.Timestamp(6)
+    updatedAt   DateTime @updatedAt @db.Timestamp(6)
+
+    @@map("report_more_detail")
+}

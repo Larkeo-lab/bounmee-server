@@ -53,7 +53,15 @@ export const reportQuerySchema = z.object({
   search: z.string().optional(),
 });
 
+// Extra-info entry added to an existing report
+export const reportMoreDetailSchema = z.object({
+  detail: z.string().min(1, "Detail is required").trim(),
+  images: z.array(z.string()).optional(),
+  attachments: z.string().optional().nullable(),
+});
+
 // Types
 export type ReportCreateRequest = z.infer<typeof reportCreateSchema>;
 export type ReportUpdateRequest = z.infer<typeof reportUpdateSchema>;
 export type ReportQueryRequest = z.infer<typeof reportQuerySchema>;
+export type ReportMoreDetailRequest = z.infer<typeof reportMoreDetailSchema>;

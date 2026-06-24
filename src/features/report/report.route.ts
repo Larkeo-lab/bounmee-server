@@ -15,6 +15,11 @@ router.get(
 );
 router.get("/:id", authMiddleware, errorHandler(reportController.getReportById));
 router.put("/:id", authMiddleware, errorHandler(reportController.updateReport));
+router.post(
+  "/:id/more-detail",
+  authMiddleware,
+  errorHandler(reportController.addReportMoreDetail),
+);
 router.put("/:id/forward", authMiddleware, errorHandler(reportController.forwardReport));
 router.put("/:id/receive", authMiddleware, errorHandler(reportController.receiveReport));
 router.put("/:id/resolve", authMiddleware, errorHandler(reportController.resolveReport));
