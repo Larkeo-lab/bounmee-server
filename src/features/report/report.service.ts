@@ -195,8 +195,67 @@ export const getAllReportsService = async (
     prisma.report.count({ where }),
   ]);
 
+  // Attach the linked village chief (ນາຍບ້ານ) and district police (ປກສ ເມືອງ)
+  // office images so the report cards can show their image / bgImage.
+  const villageIds = [
+    ...new Set(reports.map((r) => r.villageId).filter(Boolean) as string[]),
+  ];
+  const districtIds = [
+    ...new Set(reports.map((r) => r.districtId).filter(Boolean) as string[]),
+  ];
+
+  const villageChiefUsers = villageIds.length
+    ? await prisma.user.findMany({
+        where: {
+          villageId: { in: villageIds },
+          userType: "VILLAGE_CHIEF",
+          isActive: true,
+        },
+        select: {
+          villageId: true,
+          villageChief: {
+            select: { image: true, bgImage: true, chiefName: true },
+          },
+        },
+      })
+    : [];
+  const vcByVillage = new Map(
+    villageChiefUsers
+      .filter((u) => u.villageId && u.villageChief)
+      .map((u) => [u.villageId as string, u.villageChief]),
+  );
+
+  const districtUsers = districtIds.length
+    ? await prisma.user.findMany({
+        where: {
+          districtId: { in: districtIds },
+          userType: "DISTRICT_POLICE",
+          isActive: true,
+        },
+        select: {
+          districtId: true,
+          policeDistrict: {
+            select: { image: true, bgImage: true, chiefName: true },
+          },
+        },
+      })
+    : [];
+  const pdByDistrict = new Map(
+    districtUsers
+      .filter((u) => u.districtId && u.policeDistrict)
+      .map((u) => [u.districtId as string, u.policeDistrict]),
+  );
+
+  const enriched = reports.map((r) => ({
+    ...r,
+    villageChiefInfo: r.villageId ? vcByVillage.get(r.villageId) || null : null,
+    policeDistrictInfo: r.districtId
+      ? pdByDistrict.get(r.districtId) || null
+      : null,
+  }));
+
   return {
-    reports,
+    reports: enriched,
     total,
   };
 };
@@ -412,7 +471,11 @@ export const receiveReportService = async (id: string, userId: string) => {
 };
 
 // "ແກ້ໄຂສຳເລັດ" — mark the report resolved (citizen then sees it as resolved).
-export const resolveReportService = async (id: string, userId: string) => {
+export const resolveReportService = async (
+  id: string,
+  userId: string,
+  data?: { evidenceDetail?: string; caseConclusion?: string },
+) => {
   const report = await prisma.report.findUnique({
     where: { id },
     select: { id: true, currentAssignee: true },
@@ -427,7 +490,11 @@ export const resolveReportService = async (id: string, userId: string) => {
   const [updated] = await prisma.$transaction([
     prisma.report.update({
       where: { id },
-      data: { status: "APPROVED" },
+      data: {
+        status: "APPROVED",
+        evidenceDetail: data?.evidenceDetail,
+        caseConclusion: data?.caseConclusion,
+      },
       include: REPORT_INCLUDE,
     }),
     prisma.reportHistory.create({
@@ -501,6 +568,8 @@ export const updateReportService = async (id: string, data: ReportUpdateRequest)
       attachments: data.attachments !== undefined ? data.attachments || null : undefined,
       status: data.status,
       currentAssignee: data.currentAssignee,
+      evidenceDetail: data.evidenceDetail,
+      caseConclusion: data.caseConclusion,
     },
     include: {
       province: true,

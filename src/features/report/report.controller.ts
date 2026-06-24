@@ -92,7 +92,8 @@ async function receiveReport(req: Request, res: Response) {
 async function resolveReport(req: Request, res: Response) {
   const { id } = idSchema.parse(req.params);
   const byUserId = res.locals.payload.userId;
-  const result = await resolveReportService(id, byUserId);
+  const { evidenceDetail, caseConclusion } = req.body || {};
+  const result = await resolveReportService(id, byUserId, { evidenceDetail, caseConclusion });
   ResponseSuccess(res, result);
 }
 

@@ -28,6 +28,9 @@ model Report {
     createdAt DateTime @default(now()) @db.Timestamp(6)
     updatedAt DateTime @updatedAt @db.Timestamp(6)
 
+    evidenceDetail String? @db.Text
+    caseConclusion String? @db.Text
+
     @@map("report")
 }
 

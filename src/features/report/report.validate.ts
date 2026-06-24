@@ -38,6 +38,8 @@ export const reportUpdateSchema = z.object({
   attachments: z.any().optional().nullable(),
   status: z.nativeEnum(ReportStatus).optional(),
   currentAssignee: z.nativeEnum(UserType).optional(),
+  evidenceDetail: z.string().trim().optional().nullable(),
+  caseConclusion: z.string().trim().optional().nullable(),
 });
 
 // Report Query/Filtering Schema
