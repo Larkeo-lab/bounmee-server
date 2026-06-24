@@ -400,6 +400,9 @@ const buildDistrictReportSummary = async (district: {
     badgeCount,
     date: formattedDate,
     imageUrl: district.image || "",
+    // ປກສ ເມືອງ office images
+    image: districtUser?.policeDistrict?.image || null,
+    bgImage: districtUser?.policeDistrict?.bgImage || null,
     address: districtUser?.address || "",
     phone: districtUser?.phone || "",
     reports,
@@ -523,7 +526,10 @@ export const getPoliceDistrictByIdAndReportService = async (
     deputyChiefName: districtUser?.policeDistrict?.deputyChiefName || "",
     phone: districtUser?.phone || "",
     address: districtUser?.address || "",
-    imageUrl: district.image || "",
+    // ປກສ ເມືອງ office images (bgImage used as the cover)
+    imageUrl: districtUser?.policeDistrict?.bgImage || district.image || "",
+    image: districtUser?.policeDistrict?.image || null,
+    bgImage: districtUser?.policeDistrict?.bgImage || null,
     villageCount: villages.length,
     totalReports,
     villages: villagesWithReports,
